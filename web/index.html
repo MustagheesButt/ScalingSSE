@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Scaling SSE Demo</title>
+  </head>
+
+  <body>
+    <script>
+      const HOST = "http://localhost:8080";
+      const eventSource = new EventSource(`${HOST}/sse`);
+      
+      eventSource.onmessage = ({ data }) => {
+        console.log('New message', JSON.parse(data));
+      };
+    </script>
+  </body>
+</html>
