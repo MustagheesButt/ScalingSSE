@@ -1,19 +1,28 @@
 import { Injectable, MessageEvent } from '@nestjs/common';
-import { fromEvent, Observable } from 'rxjs';
-import { EventEmitter } from 'events';
+import { Observable } from 'rxjs';
+import { RedisService } from '@liaoliaots/nestjs-redis';
+import Redis from 'ioredis';
 
 @Injectable()
 export class SseService {
-  private readonly emitter = new EventEmitter();
+  private redisPublisher: Redis;
+  private redisSubscriber: Redis;
 
-  constructor() {
+  constructor(private readonly redisService: RedisService) {
+    this.redisPublisher = this.redisService.getClient('pub')
+    this.redisSubscriber = this.redisService.getClient('sub')
   }
 
   subscribe(channel: string) {
-    return fromEvent<MessageEvent>(this.emitter, channel);
+    this.redisSubscriber.subscribe(channel);
+    return new Observable<MessageEvent>((observer) => {
+      this.redisSubscriber.on('message', (channel, message) => {
+        observer.next(message);
+      });
+    });
   }
 
   emit(channel: string, data?: object) {
-    this.emitter.emit(channel, { data })
+    this.redisPublisher.publish(channel, JSON.stringify(data));
   }
 }

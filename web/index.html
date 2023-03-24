@@ -20,7 +20,7 @@
 
       eventSource.onmessage = ({ data }) => {
         console.log('New message', JSON.parse(data));
-	sseList.innerHTML += `<li>${data}</li>`
+        sseList.innerHTML += `<li>${data}</li>`
       };
 
       eventSource.onerror = (e) => {
