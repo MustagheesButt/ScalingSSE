@@ -1,10 +1,14 @@
 import { Controller, Get, Sse, MessageEvent } from '@nestjs/common';
 import { Observable, interval, map } from 'rxjs';
 import { AppService } from './app.service';
+import { SseService } from './sse.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly sseService: SseService
+  ) {}
 
   @Get()
   getHello(): string {
@@ -14,7 +18,12 @@ export class AppController {
   
   @Sse('sse')
   sse(): Observable<MessageEvent> {
-    return interval(1000).pipe(map((_) => ({ data: { hello: 'world', pid: process.pid } })));
+    return this.sseService.subscribe('main');
   }
 
+  @Get('fire-event')
+  fireEvent(): string {
+    this.sseService.emit('main', {hello: 'world', pid: process.pid})
+    return 'fired an event';
+  }
 }

@@ -5,13 +5,31 @@
   </head>
 
   <body>
+    <main>
+      <h1>SSE Messages</h1>
+      <ul id="sse"></ul>
+
+      <button id="send-event">Send Event</button>
+    </main>
+
     <script>
       const HOST = "http://localhost:8080";
       const eventSource = new EventSource(`${HOST}/sse`);
-      
+      const sseList = document.querySelector('#sse');
+      const sendEventBtn = document.querySelector('#send-event');
+
       eventSource.onmessage = ({ data }) => {
         console.log('New message', JSON.parse(data));
+	sseList.innerHTML += `<li>${data}</li>`
       };
+
+      eventSource.onerror = (e) => {
+        console.log('Something went wrong with the SSE connection');
+      }
+
+      sendEventBtn.onclick = (e) => {
+        fetch(`${HOST}/fire-event`)
+      }
     </script>
   </body>
 </html>
