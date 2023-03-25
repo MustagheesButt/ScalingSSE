@@ -11,6 +11,10 @@ export class SseService {
   constructor(private readonly redisService: RedisService) {
     this.redisPublisher = this.redisService.getClient('pub')
     this.redisSubscriber = this.redisService.getClient('sub')
+
+    setInterval(() => {
+      this.emit('main', {type: 'ping'})
+    }, 30_000);
   }
 
   subscribe(channel: string) {
